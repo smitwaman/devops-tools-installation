@@ -9,5 +9,5 @@ for simple pipeline we will need following tools installation.
 5. docker
 6. k8s
 7. prometheus
-8. graphana
+8. grafana
 
