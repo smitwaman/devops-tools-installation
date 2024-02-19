@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Function to check if a command is available
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install a package if it's not already installed
+install_package() {
+    if ! command_exists "$1"; then
+        echo "Installing $1..."
+        sudo apt-get install -y "$1"
+    else
+        echo "$1 is already installed."
+    fi
+}
+
+# Function to check and install tools
+check_and_install_tools() {
+    for tool in "$@"; do
+        install_package "$tool"
+    done
+}
+
+# Prompt user for Security Group ID, AWS Region, and TCP Port
+read -p "Enter the Security Group ID: " security_group_id
+read -p "Enter the AWS Region (e.g., us-east-1): " aws_region
+read -p "Enter the TCP Port: " tcp_port
+
+# Authorize ingress for the specified TCP port
+aws ec2 authorize-security-group-ingress --group-id "$security_group_id" --protocol tcp --port "$tcp_port" --cidr 0.0.0.0/0 --region "$aws_region"
+
+echo "Inbound rule for TCP port $tcp_port from anywhere (IPv4) has been added to the security group with ID $security_group_id in the region $aws_region."
