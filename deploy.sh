@@ -60,17 +60,10 @@ docker run -d --name prometheus -p 9090:9090 prom/prometheus
 # Start Grafana container
 docker run -d --name grafana -p 3000:3000 grafana/grafana
 
-# Deploy Kind cluster with two nodes
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.12.0/kind-linux-amd64
-chmod +x ./kind
-sudo mv ./kind /usr/local/bin/kind
-kind create cluster --config - <<EOF
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-- role: worker
-EOF
+# Deploy k8s
+curl -s https://download.opensuse.org/repositories/isv:/Rancher:/stable/deb/Release.key | gpg --dearmor | sudo dd status=none of=/usr/share/keyrings/isv-rancher-stable-archive-keyring.gpg
+echo 'deb [signed-by=/usr/share/keyrings/isv-rancher-stable-archive-keyring.gpg] https://download.opensuse.org/repositories/isv:/Rancher:/stable/deb/ ./' | sudo dd status=none of=/etc/apt/sources.list.d/isv-rancher-stable.list
+sudo apt update
+sudo apt install rancher-desktop
 
 echo "Installation completed. Git, Java, Maven, Docker, Docker Compose, kubectl, kubelet, kubeadm, AWS CLI, Terraform, Jenkins, SonarQube, ArgoCD, Prometheus, Grafana, and Kind cluster with two nodes are set up."
