@@ -1,0 +1,46 @@
+To run Jenkins, SonarQube, Argo CD, Prometheus, and Grafana containers alongside a Minikube Kubernetes cluster on Ubuntu, you'll need Docker commands to run the containers and Minikube commands to start the Kubernetes cluster. Below are the commands:
+
+### Docker Commands:
+1. Jenkins:
+
+docker run -d -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
+
+
+2. SonarQube:
+
+docker run -d -p 9000:9000 sonarqube
+
+
+3. Argo CD:
+
+kubectl create namespace argocd
+helm install argocd argo/argo-cd -n argocd
+
+
+4. Prometheus:
+
+docker run -d -p 9090:9090 prom/prometheus
+
+
+5. Grafana:
+
+docker run -d -p 3000:3000 grafana/grafana
+
+
+### Minikube Installation and Commands:
+1. Install Minikube:
+You can install Minikube by downloading the latest release binary and making it executable:
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+
+2. Start Minikube:
+
+minikube start
+
+
+3. Enable Ingress Controller(Optional):
+If you plan to use Ingress for exposing services, enable the Ingress addon:
+
+minikube addons enable ingress
