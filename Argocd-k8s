@@ -1,0 +1,30 @@
+Add the Argo CD Helm repository:
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+Create a namespace for Argo CD:
+kubectl create namespace argocd
+
+Install Argo CD using Helm:
+helm install argocd argo/argo-cd -n argocd
+This command installs Argo CD with the release name argocd in the argocd namespace.
+Wait for the deployment to finish:
+Wait for all the Argo CD components to be deployed and running. 
+You can check the status using:
+kubectl get pods -n argocd
+
+Access the Argo CD web UI:
+
+To access the Argo CD web UI, you'll need to expose the service either using port-forwarding or by creating an ingress.Port-forwarding:
+
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+Now, you can access the Argo CD web UI by navigating to https://localhost:8080 in your web browser.
+
+Login to Argo CD:The default username is admin. 
+To get the initial password, run:
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="
+{.data.password}" | base64 -d
+
+Use the generated password to log in.That's it! You have successfully installed Argo CD using Helm and accessed the web UI. Now you can start managing your Kubernetes applications with Argo CD.
