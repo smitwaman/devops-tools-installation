@@ -1,31 +1,76 @@
 #!/bin/bash
 
+# Update package lists
+sudo apt install unzip -y
+sudo apt update -y
+sudo apt upgrade -y
+# Install Git
+sudo apt install -y git
+
+# Install Java
+sudo apt install -y default-jdk
+
+# Install Maven
+sudo apt install -y maven
+
 # Install Docker
+sudo apt install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Install Docker Compose
+sudo apt install -y docker-compose
+
+# Install kubectl
+sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
-sudo apt-get install -y docker.io
+sudo apt-get install -y kubectl
 
-# Install Minikube
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
+# Install kubelet and kubeadm
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm
 
-# Start Minikube
-minikube start
+# Install AWS CLI
+sudo apt install -y awscli
 
-# Enable Ingress (Optional)
-minikube addons enable ingress
+# Install Terraform
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update && sudo apt-get install terraform
 
-# Run Jenkins container
-docker run -d -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
+# Start Jenkins container
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 jenkins/jenkins
 
-# Run SonarQube container
-docker run -d -p 9000:9000 sonarqube
+# Start SonarQube container
+docker run -d --name sonarqube -p 9000:9000 sonarqube
 
-# Run Argo CD
+# Start ArgoCD container
 kubectl create namespace argocd
-helm install argocd argo/argo-cd -n argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-# Run Prometheus container
-docker run -d -p 9090:9090 prom/prometheus
+# Start Prometheus container
+docker run -d --name prometheus -p 9090:9090 prom/prometheus
 
-# Run Grafana container
-docker run -d -p 3000:3000 grafana/grafana
+# Start Grafana container
+docker run -d --name grafana -p 3000:3000 grafana/grafana
+
+# Deploy Kind cluster with two nodes
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.12.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+kind create cluster --config - <<EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+EOF
+
+echo "Installation completed. Git, Java, Maven, Docker, Docker Compose, kubectl, kubelet, kubeadm, AWS CLI, Terraform, Jenkins, SonarQube, ArgoCD, Prometheus, Grafana, and Kind cluster with two nodes are set up."
