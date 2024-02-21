@@ -44,15 +44,14 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt-get update && sudo apt-get install terraform
 
-# Start Jenkins container
-docker run -d --name jenkins -p 8080:8080 -p 50000:50000 jenkins/jenkins
+# Start Jenkins container(runnig docker socker as jenkins docker socker is not recommended)
+docker run -d   --name jenkins   --user root   -p 8080:8080 -p 50000:50000   -v /var/jenkins_home:/var/jenkins_home   -v /var/run/docker.sock:/var/run/docker.sock   smitwaman/jenkins:smit
 
 # Start SonarQube container
 docker run -d --name sonarqube -p 9000:9000 sonarqube
 
 # Start ArgoCD container
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
 
 # Start Prometheus container
 docker run -d --name prometheus -p 9090:9090 prom/prometheus
@@ -61,9 +60,6 @@ docker run -d --name prometheus -p 9090:9090 prom/prometheus
 docker run -d --name grafana -p 3000:3000 grafana/grafana
 
 # Deploy k8s
-curl -s https://download.opensuse.org/repositories/isv:/Rancher:/stable/deb/Release.key | gpg --dearmor | sudo dd status=none of=/usr/share/keyrings/isv-rancher-stable-archive-keyring.gpg
-echo 'deb [signed-by=/usr/share/keyrings/isv-rancher-stable-archive-keyring.gpg] https://download.opensuse.org/repositories/isv:/Rancher:/stable/deb/ ./' | sudo dd status=none of=/etc/apt/sources.list.d/isv-rancher-stable.list
-sudo apt update
-sudo apt install rancher-desktop
+
 
 echo "Installation completed. Git, Java, Maven, Docker, Docker Compose, kubectl, kubelet, kubeadm, AWS CLI, Terraform, Jenkins, SonarQube, ArgoCD, Prometheus, Grafana, and Kind cluster with two nodes are set up."
