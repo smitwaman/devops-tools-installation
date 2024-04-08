@@ -1,3 +1,4 @@
+#!/bin/bash
 # Installation of SonarQube:
 
 # Install Postgresql 15
