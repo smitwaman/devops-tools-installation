@@ -3,69 +3,49 @@
 # Install Postgresql 15
 sudo apt update
 # sudo apt upgrade
-
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-
 wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc &>/dev/null
-
 sudo apt update
 sudo apt-get -y install postgresql postgresql-contrib
 sudo systemctl enable postgresql
 
 #Create Database for Sonarqube
-
 sudo passwd postgres
 su - postgres
-
 createuser sonar
 psql 
 ALTER USER sonar WITH ENCRYPTED password 'sonar';
 CREATE DATABASE sonarqube OWNER sonar;
 grant all privileges on DATABASE sonarqube to sonar;
 \q
-
 exit
 
 
 # Install Java 17
 sudo bash
-
 apt install -y wget apt-transport-https
-
 mkdir -p /etc/apt/keyrings
-
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
-
 echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-
 apt update
-
 apt install temurin-17-jdk
-
 update-alternatives --config java
-
 /usr/bin/java --version
-
 exit 
 
 
 # Increase Limits
-
 sudo vim /etc/security/limits.conf
 Paste the below values at the bottom of the file
-
 sonarqube   -   nofile   65536
 sonarqube   -   nproc    4096
 sudo vim /etc/sysctl.conf
 Paste the below values at the bottom of the file
-
 vm.max_map_count = 262144
 Reboot to set the new limits
-
 sudo reboot
 
 # Install Sonarqube
-
 sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
 sudo apt install unzip
 sudo unzip sonarqube-9.9.0.65466.zip -d /opt
