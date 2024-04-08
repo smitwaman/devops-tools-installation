@@ -1,8 +1,8 @@
-Virtual Machine running Ubuntu 22.04 or newer
+# Installation of SonarQube:
 
-Install Postgresql 15
+# Install Postgresql 15
 sudo apt update
-sudo apt upgrade
+# sudo apt upgrade
 
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 
@@ -11,7 +11,9 @@ wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt
 sudo apt update
 sudo apt-get -y install postgresql postgresql-contrib
 sudo systemctl enable postgresql
-Create Database for Sonarqube
+
+#Create Database for Sonarqube
+
 sudo passwd postgres
 su - postgres
 
@@ -23,10 +25,13 @@ grant all privileges on DATABASE sonarqube to sonar;
 \q
 
 exit
-Install Java 17
+
+
+# Install Java 17
 sudo bash
 
 apt install -y wget apt-transport-https
+
 mkdir -p /etc/apt/keyrings
 
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
@@ -34,12 +39,18 @@ wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /et
 echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 
 apt update
+
 apt install temurin-17-jdk
+
 update-alternatives --config java
+
 /usr/bin/java --version
 
 exit 
-Increase Limits
+
+
+# Increase Limits
+
 sudo vim /etc/security/limits.conf
 Paste the below values at the bottom of the file
 
@@ -52,7 +63,9 @@ vm.max_map_count = 262144
 Reboot to set the new limits
 
 sudo reboot
-Install Sonarqube
+
+# Install Sonarqube
+
 sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
 sudo apt install unzip
 sudo unzip sonarqube-9.9.0.65466.zip -d /opt
@@ -60,11 +73,12 @@ sudo mv /opt/sonarqube-9.9.0.65466 /opt/sonarqube
 sudo groupadd sonar
 sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar
 sudo chown sonar:sonar /opt/sonarqube -R
-Update Sonarqube properties with DB credentials
+
+# Update Sonarqube properties with DB credentials
 
 sudo vim /opt/sonarqube/conf/sonar.properties
-Find and replace the below values, you might need to add the sonar.jdbc.url
-
+# Find and replace the below values, you might need to add the sonar.jdbc.url
+```
 sonar.jdbc.username=sonar
 sonar.jdbc.password=sonar
 sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
@@ -92,11 +106,13 @@ LimitNPROC=4096
 
 [Install]
 WantedBy=multi-user.target
-Start Sonarqube and Enable service
+```
+
+# Start Sonarqube and Enable service
 
 sudo systemctl start sonar
 sudo systemctl enable sonar
 sudo systemctl status sonar
 sudo tail -f /opt/sonarqube/logs/sonar.log
-Access the Sonarqube UI
-http://<IP>:9000
+# Access the Sonarqube UI
+# http://<IP>:9000
